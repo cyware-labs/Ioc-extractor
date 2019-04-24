@@ -1,4 +1,4 @@
-import urllib
+import urllib.request
 from bs4 import BeautifulSoup
 import ioc_finder
 
@@ -41,12 +41,14 @@ defang_mappings = {
         }
 }
 
+
 def defang(data):
     for key in data:
         if key in defang_mappings.keys():
             new_data = data[key]
             data[key] = [d.replace(defang_mappings[key]['find'], defang_mappings[key]['replace']) for d in new_data]
     return data
+
 
 def remove_html_data(text):
     soup = BeautifulSoup(text, "html.parser")
@@ -72,10 +74,11 @@ def find_iocs(text):
     iocs = ioc_finder.find_iocs(text)
     return iocs
 
+
 def parse_indicators_url(link, fang=True):
     user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
-    request = urllib.request.Request(link, headers={'User-Agent': user_agent})
-    f = urllib.request.urlopen(request)
+    url_request = urllib.request.Request(link, headers={'User-Agent': user_agent})
+    f = urllib.request.urlopen(url_request)
     content = f.read().decode().lower()
     plain_text = remove_html_data(content)
     data = find_iocs(plain_text)
